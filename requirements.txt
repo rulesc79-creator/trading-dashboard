@@ -1,0 +1,10 @@
+requests
+pandas
+numpy
+yfinance
+ta
+vaderSentiment
+feedparser
+python-dotenv
+beautifulsoup4
+lxml
