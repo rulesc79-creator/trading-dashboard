@@ -1,14 +1,9 @@
-# report_telegram.py - Daily report to Telegram
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
 import requests
 import analysis
 import config
-
-
 SIGNAL_ES = {"LONG": "ALCISTA", "SHORT": "BAJISTA", "NEUTRAL": "LATERAL"}
-
 def build_report(results: list) -> str:
     lines = ["📊 Reporte Matutino de Trading", ""]
     for r in results:
@@ -26,8 +21,6 @@ def build_report(results: list) -> str:
         lines.append("")
     lines.append("— Generado automáticamente")
     return "\n".join(lines)
-
-
 def send_telegram(text: str) -> bool:
     if not config.TELEGRAM_BOT_TOKEN:
         print("TELEGRAM_BOT_TOKEN not set - printing report instead")
@@ -43,15 +36,18 @@ def send_telegram(text: str) -> bool:
     except Exception as e:
         print(f"Telegram error: {e}")
         return False
-
-
 def run_daily_report(timeframe: str = "D1") -> str:
     results = analysis.analyze_all(timeframe)
     text = build_report(results)
+    try:
+        import llm_analysis
+        llm = llm_analysis.analyze_report(text)
+        if llm:
+            text = text + "\n🤖 Análisis IA (Groq):\n" + llm
+    except Exception as e:
+        print(f"LLM analysis skipped: {e}")
     send_telegram(text)
     return text
-
-
 if __name__ == "__main__":
     txt = run_daily_report("D1")
     print("\n" + txt)
