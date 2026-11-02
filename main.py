@@ -1,14 +1,23 @@
-# main.py - Entry point: dashboard + cron scheduler
-import sys, os
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+name: Trading Report
 
-import cron
-import dashboard
-import uvicorn
+on:
+  schedule:
+    - cron: '0 8 * * *'
+    - cron: '30 12 * * *'
+  workflow_dispatch:
 
-if __name__ == "__main__":
-    scheduler = cron.start_scheduler()
-    try:
-        uvicorn.run(dashboard.app, host="127.0.0.1", port=8000)
-    finally:
-        scheduler.shutdown()
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: pip install -r requirements.txt
+      - name: Run report
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: '8941318934'
+        run: python report_telegram.py
