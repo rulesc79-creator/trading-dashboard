@@ -20,4 +20,5 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: '8941318934'
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: python report_telegram.py
